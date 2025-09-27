@@ -8,8 +8,9 @@ COUNT(city)- COUNT(DISTINCT city)
 FROM station
 
 /* Bài tập 3: https://www.hackerrank.com/challenges/the-blunder/problem?isFullScreen=true */
-
-
+SELECT 
+CEILING(AVG(salary)-AVG(REPLACE(salary,'0','')))
+FROM EMPLOYEES 
 
 
 /* Bài tập 4: https://datalemur.com/questions/alibaba-compressed-mean */
