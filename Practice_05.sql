@@ -31,4 +31,13 @@ ON products.product_id=customer_contracts.product_id
 GROUP BY customer_id
 HAVING COUNT(DISTINCT product_category)=3
 
-/* Bài tập 5: 
+/* Bài tập 5: https://leetcode.com/problems/the-number-of-employees-which-report-to-each-employee/?envType=study-plan-v2&envId=top-sql-50 */
+SELECT 
+a.employee_id,
+a.name,
+COUNT(b.reports_to) as reports_count,
+ROUND(avg(b.age)) as average_age
+FROM Employees as a
+JOIN Employees as b
+ON a.employee_id=b.reports_to
+GROUP BY a.employee_id
