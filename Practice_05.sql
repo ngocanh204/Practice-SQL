@@ -13,3 +13,22 @@ ROUND(CAST(COUNT(signup_action) AS decimal)/COUNT(user_id),2) as confirm_rate
 FROM emails
 LEFT JOIN texts ON emails.email_id=texts.email_id
 AND texts.signup_action='Confirmed'
+
+/* Bài tập 3:https://datalemur.com/questions/time-spent-snaps */
+SELECT b.age_bucket, 
+ROUND((SUM(CASE WHEN activity_type  = 'send' THEN time_spent ELSE 0 END)* 100.0 /SUM(time_spent)),2) AS send_perc, 
+ROUND((SUM(CASE WHEN activity_type  = 'open' THEN time_spent ELSE 0 END)* 100.0 /SUM(time_spent)),2) AS open_perc 
+FROM activities as a
+LEFT JOIN age_breakdown as b ON a.user_id = b.user_id
+WHERE activity_type IN ('open', 'send')
+GROUP BY b.age_bucket;
+
+/* Bài tập 4: https://datalemur.com/questions/supercloud-customer */
+SELECT customer_id
+FROM customer_contracts
+INNER JOIN products 
+ON products.product_id=customer_contracts.product_id
+GROUP BY customer_id
+HAVING COUNT(DISTINCT product_category)=3
+
+/* Bài tập 5: 
