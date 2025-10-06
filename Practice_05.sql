@@ -41,3 +41,18 @@ FROM Employees as a
 JOIN Employees as b
 ON a.employee_id=b.reports_to
 GROUP BY a.employee_id
+
+
+/* Bài tập 6: https://leetcode.com/problems/list-the-products-ordered-in-a-period/?envType=study-plan-v2&envId=top-sql-50 */
+SELECT a.product_name,
+SUM(unit) AS unit
+FROM Products as a
+LEFT JOIN Orders as b
+ON a.product_id=b.product_id
+WHERE b.order_date LIKE '2020-02-%'
+GROUP BY a.product_name
+HAVING SUM(unit)>=100
+
+/* Bài tập 7: https://datalemur.com/404 */
+
+WEB LỖI Ạ 
