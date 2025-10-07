@@ -203,6 +203,33 @@ JOIN public.city as d ON c.city_id=d.city_id
 GROUP BY d.city
 ORDER BY SUM(a.amount) DESC
 
+/* Question 8:
+
+Level: Intermediate
+
+Topic: JOIN & GROUP BY
+
+Task: Tạo danh sách trả ra 2 cột dữ liệu:
+
+- cột 1: thông tin thành phố và đất nước ( format: “city, country")
+
+- cột 2: doanh thu tương ứng với cột 1
+
+Question: Thành phố của đất nước nào đat doanh thu thấp nhất ?
+
+Answer: United States, Tallahassee : 50.85 */
+
+SELECT 
+city.city || ', ' || country.country AS city_country,
+    SUM(payment.amount) AS total_revenue
+FROM payment
+JOIN rental ON payment.rental_id = rental.rental_id
+JOIN customer ON rental.customer_id = customer.customer_id
+JOIN address ON customer.address_id = address.address_id
+JOIN city ON address.city_id = city.city_id
+JOIN country ON city.country_id = country.country_id
+GROUP BY city_country
+ORDER BY total_revenue ASC;
 
 
 
