@@ -135,5 +135,19 @@ UNION ALL
   GROUP BY m.movie_id, m.title
   ORDER BY AVG(mr.rating) DESC, m.title ASC
   LIMIT 1
-);
+); 
+
+/* Bìa 12: https://leetcode.com/problems/friend-requests-ii-who-has-the-most-friends/?envType=study-plan-v2&envId=top-sql-50 */
+WITH all_ids AS (
+   SELECT requester_id AS id 
+   FROM RequestAccepted
+   UNION ALL
+   SELECT accepter_id AS id
+   FROM RequestAccepted)
+SELECT id, 
+   COUNT(id) AS num
+FROM all_ids
+GROUP BY id
+ORDER BY COUNT(id) DESC
+LIMIT 1
 
