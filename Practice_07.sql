@@ -38,3 +38,21 @@ spend,
 transaction_date
 FROM twt_transaction_3rd 
 WHERE count_transaction>=3 and rank_transaction=3 
+
+
+/* Bài tập 4: https://datalemur.com/questions/histogram-users-purchases */
+
+with twt_nearest_time_trans as(
+SELECT 
+transaction_date,
+user_id,
+DENSE_RANK() OVER(PARTITION BY user_id ORDER BY transaction_date DESC) AS time_rank
+FROM user_transactions) 
+
+SELECT 
+transaction_date,
+user_id,
+COUNT(*) 
+FROM twt_nearest_time_trans
+WHERE time_rank=1 
+GROUP BY transaction_date,user_id
