@@ -68,3 +68,55 @@ SELECT
     ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)
   ,2) AS rolling_avg_3d
 FROM tweets;
+
+/* Bài tập 6: https://datalemur.com/questions/repeated-payments */
+
+with twt_payments as (SELECT 
+merchant_id,
+credit_card_id,
+amount,
+transaction_timestamp,
+EXTRACT(MINUTE from transaction_timestamp) - 
+EXTRACT(MINUTE FROM Lag(transaction_timestamp) OVER(PARTITION BY merchant_id,credit_card_id,amount ORDER BY transaction_timestamp )) as minute_difference 
+FROM transactions)
+
+SELECT COUNT(merchant_id) AS payment_count
+FROM twt_payments 
+WHERE minute_difference BETWEEN 0 and 9 
+
+/* Bài tập 7: https://datalemur.com/questions/sql-highest-grossing */
+
+with twt_ranking AS  (
+SELECT 
+category,
+product,
+SUM(spend) as total_spend,
+RANK()  OVER (PARTITION BY category ORDER BY SUM(spend) desc) as ranking  
+FROM product_spend 
+WHERE EXTRACT(YEAR FROM transaction_date) = 2022
+GROUP BY category, product)
+SELECT 
+category,
+product,
+total_spend
+FROM twt_ranking
+WHERE ranking in (1,2)
+
+/* Bài tập 8: https://datalemur.com/questions/top-fans-rank */
+
+WITH TWT_SONG AS(
+SELECT
+a.artist_name,
+DENSE_RANK() OVER(ORDER BY COUNT(b.song_id) desc) AS artist_rank
+FROM artists as a 
+JOIN songs as b ON a.artist_id=b.artist_id
+JOIN global_song_rank as c ON b.song_id=c.song_id
+WHERE c.rank <= 10
+GROUP BY a.artist_name)
+SELECT 
+artist_name,
+artist_rank
+FROM TWT_SONG
+WHERE artist_rank <= 5
+
+
