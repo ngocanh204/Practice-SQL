@@ -45,4 +45,24 @@ student
 FROM Seat 
 ORDER BY id asc
 
-/* Bài tập 4: 
+/* Bài tập 4: https://leetcode.com/problems/restaurant-growth/?envType=study-plan-v2&envId=top-sql-50 */
+
+WITH TWT_AMOUNT as (
+    SELECT visited_on   ,
+    SUM(amount) as daily_amount
+    FROM Customer 
+    GROUP BY visited_on   
+),
+seven_day as (
+    SELECT visited_on,
+    SUM( daily_amount) OVER(ORDER BY visited_on
+    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS amount,
+    ROUND(AVG(daily_amount) OVER(ORDER BY visited_on  ROWS BETWEEN 6 PRECEDING AND CURRENT ROW),2) as average_amount ,
+    COUNT(*) OVER(ORDER BY visited_on
+    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) as Day_count
+    FROM TWT_AMOUNT
+)
+SELECT 
+visited_on,amount ,average_amount  
+from seven_day
+WHERE Day_count = 7 
