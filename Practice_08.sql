@@ -66,3 +66,45 @@ SELECT
 visited_on,amount ,average_amount  
 from seven_day
 WHERE Day_count = 7 
+
+
+/* Bài tập 5: https://leetcode.com/problems/investments-in-2016/?envType=study-plan-v2&envId=top-sql-50 */
+
+WITH twt_city as(
+SELECT lat, lon
+FROM Insurance
+GROUP BY lat, lon
+HAVING COUNT(*) = 1
+), 
+duplicate_twt as(
+SELECT tiv_2015,
+COUNT(tiv_2015)
+FROM Insurance
+GROUP BY tiv_2015
+HAVING COUNT(tiv_2015) >1
+)
+
+select  
+ROUND(SUM(tiv_2016)::numeric ,2) as tiv_2016 
+FROM Insurance
+WHERE tiv_2015 in (SELECT tiv_2015 FROM duplicate_twt )
+AND (lat, lon) in (SELECT lat, lon FROM twt_city)
+
+
+/* Bài tập 6: https://leetcode.com/problems/department-top-three-salaries/?envType=study-plan-v2&envId=top-sql-50 */
+
+WITH twt_company as (
+    SELECT 
+b.name as Department ,
+a.name as Employee ,
+a.Salary,
+DENSE_RANK() OVER(PARTITION BY b.name ORDER BY a.Salary DESC)
+FROM Employee as a 
+JOIN Department AS b 
+ON a.departmentId = b.id )
+
+SELECT department,
+employee,
+salary 
+FROM twt_company
+WHERE dense_rank <=3
