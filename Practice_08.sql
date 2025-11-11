@@ -108,3 +108,46 @@ employee,
 salary 
 FROM twt_company
 WHERE dense_rank <=3
+
+/* Bài tập 7: https://leetcode.com/problems/last-person-to-fit-in-the-bus/?envType=study-plan-v2&envId=top-sql-50 */
+
+WITH twt_table as(
+    Select person_name,
+SUM(weight) OVER(ORDER BY turn ) as total_weight
+FROM Queue) 
+SELECT person_name 
+FROM twt_table
+WHERE total_weight <=1000 
+ORDER BY total_weight DESC 
+LIMIT 1 
+
+/* Bài tập 8: https://leetcode.com/problems/product-price-at-a-given-date/?envType=study-plan-v2&envId=top-sql-50 */
+
+WITH latest AS (
+  SELECT
+    p.product_id,
+    p.new_price,
+    p.change_date,
+    ROW_NUMBER() OVER (
+      PARTITION BY p.product_id
+      ORDER BY p.change_date DESC
+    ) AS rn
+  FROM Products p
+  WHERE p.change_date <= '2019-08-16'
+)
+SELECT product_id, new_price AS price
+FROM latest
+WHERE rn = 1
+
+UNION ALL
+
+SELECT p.product_id, 10 AS price
+FROM Products p
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM Products p2
+  WHERE p2.product_id = p.product_id
+    AND p2.change_date <= '2019-08-16'
+)
+GROUP BY p.product_id
+ORDER BY product_id;
