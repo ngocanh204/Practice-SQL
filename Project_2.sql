@@ -139,3 +139,22 @@ ranked as (
   FROM ranked
   WHERE rank_per_month <=5
   ORDER BY month,rank_per_month;
+
+
+-- 5. Doanh thu tính đến thời điểm hiện tại trên mỗi danh mục 
+-- Thống kê tổng doanh thu theo ngày của từng danh mục sản phẩm (category) trong 3 tháng qua (giả sử ngày hiện tại là 15/4/2022)
+-- Output: dates(yyyy-mm-đd), product_categories, revenue
+
+
+WITH twt_table_5 as (
+SELECT *,FORMAT_TIMESTAMP('%Y-%m-%d', a.created_at) AS dates
+FROM bigquery-public-data.thelook_ecommerce.order_items as a 
+JOIN bigquery-public-data.thelook_ecommerce.products as b
+ON a.product_id=b.id )
+SELECT dates,
+category as product_categories,
+SUM(sale_price) as revenue
+FROM twt_table_5
+WHERE dates >= '2022-01-15 00:00:00' and dates <= '2022-04-15 23:59:59'and Status='Complete'
+GROUP BY dates,category
+ORDER BY dates DESC,revenue DESC;
