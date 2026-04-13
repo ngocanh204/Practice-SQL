@@ -46,6 +46,41 @@ WHERE country='UK'
 GROUP BY year_id,productline
 
 --5. Ai là khách hàng tốt nhất, phân tích dựa vào RFM
+
+--TÍNH TOÁN GIÁ TRỊ R-F-M THÔ 
+WITH twt_rfm_value AS (
+    SELECT 
+        customername,
+        EXTRACT(DAY FROM (CURRENT_DATE - MAX(orderdate))) AS Recency,
+        COUNT(DISTINCT ordernumber) AS Frequency,
+        SUM(sales) AS Monetary
+    FROM public.sales_dataset_rfm_prj
+    GROUP BY customername
+),
+
+-- CHẤM ĐIỂM THEO THANG ĐIỂM 1-5 THEO CÁC PHÂN VỊ
+RFM_Score AS (
+    SELECT
+        customername,
+        NTILE(5) OVER(ORDER BY recency DESC) AS R_score,
+        NTILE(5) OVER(ORDER BY frequency ASC) AS F_score,
+        NTILE(5) OVER(ORDER BY monetary ASC) AS M_score
+    FROM twt_rfm_value
+),
+-- HỢP NHẤT CHỈ SỐ RFM
+RFM AS (
+    SELECT 
+        customername,
+        -- Chuyển đổi kiểu dữ liệu sang VARCHAR để ghép chuỗi điểm (ví dụ: 5-5-5).
+        CAST(R_score AS VARCHAR) || CAST(F_score AS VARCHAR) || CAST(M_score AS VARCHAR) AS RFM_combined
+    FROM RFM_Score
+)
+-- ĐỊNH DANH PHÂN KHÚC VÀ TRÍCH XUẤT NHÓM MỤC TIÊU 
 SELECT 
-custmername,
-CURRENT_DATE - MAX
+    customername,
+    RFM_combined,
+    segment
+FROM RFM AS RFM 
+JOIN public.segment_score AS Segment
+    ON RFM.RFM_combined = Segment.scores
+WHERE segment = 'Champions';
